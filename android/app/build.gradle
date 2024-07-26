@@ -74,9 +74,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.rn_ecommerce_app"
+    namespace "com.greenplay.shopcart"
     defaultConfig {
-        applicationId "com.rn_ecommerce_app"
+        applicationId "com.greenplay.shopcart"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,4 +1,4 @@
-package com.rn_ecommerce_app
+package com.greenplay.shopcart
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

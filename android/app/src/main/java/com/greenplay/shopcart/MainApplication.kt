@@ -1,4 +1,4 @@
-package com.rn_ecommerce_app
+package com.greenplay.shopcart
 
 import android.app.Application
 import com.facebook.react.PackageList
