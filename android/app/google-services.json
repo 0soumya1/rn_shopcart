@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536871854385",
+    "project_id": "shopcart-8a8d1",
+    "storage_bucket": "shopcart-8a8d1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536871854385:android:1d78ed021e25f5142a9010",
+        "android_client_info": {
+          "package_name": "com.greenplay.shopcart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOs52ih2bjAVKYV7fAOV06MlOo-Ue6FsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

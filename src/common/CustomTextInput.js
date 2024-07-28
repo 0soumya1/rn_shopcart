@@ -15,11 +15,11 @@ const CustomTextInput = ({
       style={styles.textView}>
       <Image source={icon} style={{width: 20, height: 20}} />
       <TextInput 
-      style={{paddingLeft:10, color: '#000', width:"98%",}}
+      style={{paddingLeft:10, color: '#000', width:"98%"}}
       placeHolder={placeHolder} 
       onChangeText={(txt)=>onChangeText(txt)}
       value={value} 
-      placeholderTextColor={placeholderTextColor ? placeholderTextColor : "#888"}
+      // placeholderTextColor={placeholderTextColor ? placeholderTextColor : "#00000060"}
       keyboardType={keyboardType ? keyboardType: "default"}
       secureTextEntry={type ? true : false}
       />

@@ -22,63 +22,70 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [badName, setBadName] = useState(false);
-  const [badEmail, setBadEmail] = useState(false);
+  const [badEmail, setBadEmail] = useState("");
   const [badPhoneNumber, setBadPhoneNumber] = useState('');
   const [badPassword, setBadPassword] = useState(false);
   const [badConfirmPassword, setBadConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const signUP = () => {
-    setIsLoading(true)
+    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsLoading(true);
     let isValid = false;
     if (name === '') {
       setBadName(true);
-      setIsLoading(false)
+      setIsLoading(false);
     } else {
       setBadName(false);
       if (email === '') {
-        setBadEmail(true);
-        setIsLoading(false)
-      } else {
-        setBadEmail(false);
+        setBadEmail("Please Enter Email");
+        isValid = false;
+        setIsLoading(false);
+      } else if(!emailReg.test(email)) {
+        setBadEmail("Please Enter Valid Email");
+        isValid = false;
+        setIsLoading(false);
+      }else{
+        setBadEmail("")
+        isValid = true;
         if (phoneNumber === '') {
           setBadPhoneNumber('Please Enter Phone Number');
           isValid = false;
-          setIsLoading(false)
+          setIsLoading(false);
         } else if (phoneNumber != '' && phoneNumber.length < 10) {
           setBadPhoneNumber('Please Enter Valid Phone Number');
           isValid = false;
-          setIsLoading(false)
+          setIsLoading(false);
         } else if (phoneNumber != '' && phoneNumber.length > 10) {
           setBadPhoneNumber('Please Enter Valid Phone Number');
           isValid = false;
-          setIsLoading(false)
+          setIsLoading(false);
         } else if (phoneNumber != '' && phoneNumber.length == 10) {
           setBadPhoneNumber('');
           isValid = true;
           if (password === '') {
             setBadPassword(true);
-            setIsLoading(false)
+            setIsLoading(false);
           } else {
             setBadPassword(false);
             if (confirmPassword === '') {
               setBadConfirmPassword(true);
-              setIsLoading(false)
+              setIsLoading(false);
             } else if (confirmPassword != password) {
               setBadConfirmPassword(true);
-              setIsLoading(false)
+              setIsLoading(false);
             } else {
               setBadConfirmPassword(false);
               // setIsLoading(false)
-              setTimeout(()=>{
+              setTimeout(() => {
                 saveData();
-              }, 1000)
+              }, 1000);
+              }
             }
           }
         }
       }
     }
-  };
 
   const saveData = async () => {
     await AsyncStorage.setItem('NAME', name);
@@ -87,7 +94,7 @@ const SignUpScreen = () => {
     await AsyncStorage.setItem('PASSWORD', password);
     console.log('data saved----------->', name, email, phoneNumber, password);
     // setIsLoading(false)
-    navigation.goBack();
+    navigation.navigate("LoginScreen");
   };
 
   return (
@@ -98,75 +105,82 @@ const SignUpScreen = () => {
           style={styles.logo}
         />
         <Text style={styles.loginText}>Create New Account</Text>
-        <View
-          style={{
-            marginTop: 10,
-          }}>
-          {/* <TextInput
-          style={styles.textInput}
-          placeholder="Enter Email Id"
-          placeholderTextColor="#888"
-        />
-        <TextInput
-          style={styles.textInput}
-          placeholder="Enter Password"
-          placeholderTextColor="#888"
-        /> */}
-          <CustomTextInput
-            placeHolder={'Enter Full Name'}
-            icon={require('../assets/user.png')}
-            placeholderTextColor={'#888'}
-            value={name}
-            onChangeText={txt => setName(txt)}
-          />
+       
+        <View style={{marginTop: 10}}>
+          <View style={styles.textInput}>
+            <Image
+              source={require('../assets/user.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Full Name"
+              value={name}
+              onChangeText={txt => setName(txt)}
+            />
+          </View>
           {badName === true && (
             <Text style={styles.errorTxt}>Please Enter Full Name</Text>
           )}
-          <CustomTextInput
-            placeHolder={'Enter Email Id'}
-            icon={require('../assets/email.png')}
-            placeholderTextColor={'#888'}
-            value={email}
-            onChangeText={txt => setEmail(txt)}
-          />
-          {badEmail === true && (
-            <Text style={styles.errorTxt}>Please Enter Email Id</Text>
+          <View style={styles.textInput}>
+            <Image
+              source={require('../assets/email.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Email"
+              value={email}
+              onChangeText={txt => setEmail(txt)}
+            />
+          </View>
+          {badEmail != '' && (
+            <Text style={styles.errorTxt}>{badEmail}</Text>
           )}
-          <CustomTextInput
-            placeHolder={'Enter Phone Number'}
-            icon={require('../assets/phone.png')}
-            placeholderTextColor={'#888'}
-            keyboardType={'number-pad'}
-            value={phoneNumber}
-            onChangeText={txt => setPhoneNumber(txt)}
-          />
-          {/* {badPhoneNumber === true && (
-            <Text style={{color: 'red', marginTop: 5, marginLeft: 35}}>
-              Please Enter Phone Number
-            </Text>
-          )} */}
+          <View style={styles.textInput}>
+            <Image
+              source={require('../assets/phone.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Phone Number"
+              keyboardType={'number-pad'}
+              value={phoneNumber}
+              onChangeText={txt => setPhoneNumber(txt)}
+            />
+          </View>
           {badPhoneNumber != '' && (
             <Text style={styles.errorTxt}>{badPhoneNumber}</Text>
           )}
-          <CustomTextInput
-            placeHolder={'Enter Password'}
-            icon={require('../assets/lock.png')}
-            placeholderTextColor={'#888'}
-            // type={'password'}
-            value={password}
-            onChangeText={txt => setPassword(txt)}
-          />
+          <View style={styles.textInput}>
+            <Image
+              source={require('../assets/lock.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Password"
+              // secureTextEntry={password}
+              value={password}
+              onChangeText={txt => setPassword(txt)}
+            />
+          </View>
           {badPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Password</Text>
           )}
-          <CustomTextInput
-            placeHolder={'Enter Confirm Password'}
-            icon={require('../assets/lock.png')}
-            placeholderTextColor={'#888'}
-            // type={'password'}
-            value={confirmPassword}
-            onChangeText={txt => setConfirmPassword(txt)}
-          />
+          <View style={styles.textInput}>
+            <Image
+              source={require('../assets/lock.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Confirm Password"
+              value={confirmPassword}
+              onChangeText={txt => setConfirmPassword(txt)}
+            />
+          </View>
           {badConfirmPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Confirm Password</Text>
           )}
@@ -186,7 +200,7 @@ const SignUpScreen = () => {
           <TouchableOpacity
             style={{marginBottom: 40}}
             onPress={() => {
-              navigation.goBack();
+              navigation.navigate("LoginScreen");
             }}>
             <Text style={styles.loginTxt}>{'Login'}</Text>
           </TouchableOpacity>
@@ -200,6 +214,12 @@ const SignUpScreen = () => {
 export default SignUpScreen;
 
 const styles = StyleSheet.create({
+  txt: {
+    paddingLeft: 10,
+    color: '#000',
+    width: '98%',
+    fontSize: 15,
+  },
   loginTxt: {
     color: '#121481',
     fontSize: 18,
@@ -220,17 +240,32 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 35,
   },
+  // textInput: {
+  //   width: '85%',
+  //   height: 55,
+  //   borderWidth: 0.8,
+  //   borderRadius: 10,
+  //   borderColor: '#121481',
+  //   alignSelf: 'center',
+  //   paddingLeft: 20,
+  //   marginBottom: 30,
+  //   color: '#000',
+  // },
   textInput: {
     width: '85%',
-    height: 55,
+    height: 50,
     borderWidth: 0.8,
     borderRadius: 10,
     borderColor: '#121481',
     alignSelf: 'center',
     paddingLeft: 20,
-    marginBottom: 30,
-    color: '#000',
+    paddingRight: 20,
+    // marginBottom: 30,
+    marginTop: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
+
   loginText: {
     // color:"#000",
     color: '#121481',

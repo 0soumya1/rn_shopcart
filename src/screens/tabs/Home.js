@@ -13,11 +13,15 @@ import Header from '../../common/Header';
 import {useNavigation} from '@react-navigation/native';
 import CardView from 'react-native-cardview';
 import Loader from '../../common/Loader';
+import {useDispatch, useSelector} from 'react-redux';
+import {setProductData} from '../../redux/slices/ProductSlice';
 
 const Home = () => {
   const navigation = useNavigation();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+  // const productState = useSelector(state => state?.products);
 
   useEffect(() => {
     getProducts();
@@ -27,45 +31,59 @@ const Home = () => {
     fetch('https://fakestoreapi.com/products')
       .then(res => res.json())
       .then(json => {
-        setProducts(json)
+        setProducts(json);
         setIsLoading(false);
-    }) .catch(error => {
+        json.map(item => {
+          item.qty = 1;
+        });
+        dispatch(setProductData(json));
+      })
+      .catch(error => {
         console.error(error);
         setIsLoading(false);
       });
   };
-
   return (
     <View style={styles.container}>
       <Header
         leftIcon={require('../../assets/menu.png')}
         rightIcon={require('../../assets/cart.png')}
         title={'Explore'}
+        isCart={true}
         onClickLeftIcon={() => {
           navigation.openDrawer();
+        }}
+        onClickRightIcon={()=>{
+          navigation.navigate('Cart');
         }}
       />
       <FlatList
         data={products}
+        // data={productState?.productData}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingBottom: 80}}
         renderItem={({item, index}) => {
           return (
-            <TouchableOpacity activeOpacity={0.8} style={styles.productView}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.productView}
+              onPress={() => {
+                navigation.navigate('ProductDetail', {data: item});
+              }}>
               <CardView
                 cardElevation={2}
                 cardMaxElevation={1}
                 cornerRadius={8}
                 style={{marginVertical: 5}}>
                 <View style={styles.mainView}>
-                  <Image source={{uri: item.image}} style={styles.itemImg} />
+                  <Image source={{uri: item?.image}} style={styles.itemImg} />
                   <View style={styles.TextView}>
                     <Text style={styles.itemTitle} numberOfLines={1}>
                       {
                         //   item.title.length > 35
                         //     ? item.title.substring(0, 35) + '...'
                         //     :
-                        item.title
+                        item?.title
                       }
                     </Text>
                     <Text style={{}} numberOfLines={2}>
@@ -73,20 +91,19 @@ const Home = () => {
                         //    item.description.length > 35
                         //     ? item.description.substring(0, 35) + '...'
                         //     :
-                        item.description
+                        item?.description
                       }
                     </Text>
-                    <Text style={styles.itemPrice}>{'$ ' + item.price}</Text>
+                    <Text style={styles.itemPrice}>{'$ ' + item?.price}</Text>
                   </View>
                 </View>
               </CardView>
             </TouchableOpacity>
           );
         }}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item?.id.toString()}
       />
       <Loader modalVisible={isLoading} />
-
     </View>
   );
 };

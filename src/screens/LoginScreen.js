@@ -17,8 +17,8 @@ import Loader from '../common/Loader';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('niru@gmail.com');
-  const [password, setPassword] = useState('123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [badEmail, setBadEmail] = useState(false);
   const [badPassword, setBadPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,20 +27,27 @@ const LoginScreen = () => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.BOTTOM);
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setEmail('');
-  //     setPassword('');
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      setEmail('');
+      setPassword('');
+    }, [])
+  );
 
   const login = () => {
+    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setIsLoading(true);
     if (email === '') {
-      setBadEmail(true);
+      setBadEmail("Please Enter Email");
+      isValid = false;
       setIsLoading(false);
-    } else {
-      setBadEmail(false);
+    } else if(!emailReg.test(email)) {
+      setBadEmail("Please Enter Valid Email");
+      isValid = false;
+      setIsLoading(false);
+    }else{
+      setBadEmail("")
+      isValid = true;
       if (password === '') {
         setBadPassword(true);
         setIsLoading(false);
@@ -78,17 +85,7 @@ const LoginScreen = () => {
           style={{
             marginTop: 20,
           }}>
-          {/* <TextInput
-          style={styles.textInput}
-          placeholder="Enter Email Id"
-          placeholderTextColor="#888"
-        />
-        <TextInput
-          style={styles.textInput}
-          placeholder="Enter Password"
-          placeholderTextColor="#888"
-        /> */}
-          <CustomTextInput
+          {/* <CustomTextInput
             placeHolder={'Enter Email Id'}
             icon={require('../assets/email.png')}
             // placeholderTextColor={'#888'}
@@ -106,6 +103,37 @@ const LoginScreen = () => {
             value={password}
             onChangeText={txt => setPassword(txt)}
           />
+          {badPassword === true && (
+            <Text style={styles.errorTxt}>Please Enter Password</Text>
+          )} */}
+            <View style={styles.textInput}>
+            <Image
+              source={require('../assets/email.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Email"
+              value={email}
+              onChangeText={txt => setEmail(txt)}
+            />
+          </View>
+          {badEmail != '' && (
+            <Text style={styles.errorTxt}>{badEmail}</Text>
+          )}
+            <View style={styles.textInput}>
+            <Image
+              source={require('../assets/lock.png')}
+              style={{width: 18, height: 18}}
+            />
+            <TextInput
+              style={styles.txt}
+              placeholder="Enter Password"
+              // secureTextEntry={password}
+              value={password}
+              onChangeText={txt => setPassword(txt)}
+            />
+          </View>
           {badPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Password</Text>
           )}
@@ -139,6 +167,12 @@ const LoginScreen = () => {
 export default LoginScreen;
 
 const styles = StyleSheet.create({
+  txt: {
+    paddingLeft: 10,
+    color: '#000',
+    width: '98%',
+    fontSize: 15,
+  },
   signupTxt: {
     color: '#121481',
     fontSize: 18,
@@ -161,14 +195,17 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: '85%',
-    height: 55,
+    height: 50,
     borderWidth: 0.8,
     borderRadius: 10,
     borderColor: '#121481',
     alignSelf: 'center',
     paddingLeft: 20,
-    marginBottom: 30,
-    color: '#000',
+    paddingRight: 20,
+    // marginBottom: 30,
+    marginTop: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   loginText: {
     // color:"#000",
