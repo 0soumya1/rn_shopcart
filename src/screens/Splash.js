@@ -12,8 +12,8 @@ const Splash = () => {
   }, []);
 
   const getData = async () => {
-    const email = await AsyncStorage.getItem('EMAIL');
-    console.log("email------------", email)
+    // const email = await AsyncStorage.getItem('EMAIL');
+    // console.log("email------------", email)
 
     setTimeout(()=>{
       navigation.replace('MainNavigation');

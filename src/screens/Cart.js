@@ -18,6 +18,12 @@ import {
   setCartData,
 } from '../redux/slices/CartSlice';
 import EmptyView from '../common/EmptyView';
+import CheckoutLayout from '../common/CheckoutLayout';
+
+// const isValidUrl = url => {
+//   // Simple check to see if the URL is valid
+//   return url && typeof url === 'string' && url.startsWith('https');
+// };
 
 const Cart = () => {
   const cartState = useSelector(state => state?.cart);
@@ -29,6 +35,16 @@ const Cart = () => {
     setCartItems(cartState?.cartData);
   }, [cartState]);
   // console.log(JSON.stringify(cartState) + '---->' + cartState?.cartData?.length)
+
+  // const defaultImage = require('../assets/default_image.png');
+
+  const getTotal = () => {
+    let total = 0;
+    cartItems.map(item => {
+      total = total + item?.qty * item?.price;
+    });
+    return total.toFixed(0);
+  };
 
   return (
     <View style={styles.container}>
@@ -61,7 +77,23 @@ const Cart = () => {
                 cornerRadius={8}
                 style={{marginVertical: 5}}>
                 <View style={styles.mainView}>
-                  <Image source={{uri: item?.image}} style={styles.itemImg} />
+                  {/* <Image source={{uri: item?.image}} style={styles.itemImg} /> */}
+                  {item?.image != null && item?.image != undefined ? (
+                    <Image source={{uri: item?.image}} style={styles.itemImg} />
+                  ) : (
+                    <Image
+                      source={require('../assets/default_image.png')}
+                      style={styles.itemImg}
+                    />
+                  )}
+                  {/* <Image
+                    source={
+                      isValidUrl(item?.image)
+                        ? {uri: item?.image}
+                        : defaultImage
+                    }
+                    style={styles.itemImg}
+                  /> */}
                   <View style={styles.TextView}>
                     <Text style={styles.itemTitle} numberOfLines={1}>
                       {
@@ -71,7 +103,7 @@ const Cart = () => {
                         item?.title
                       }
                     </Text>
-                    <Text style={{}} numberOfLines={2}>
+                    <Text style={{color: '#888'}} numberOfLines={2}>
                       {
                         //    item.description.length > 35
                         //     ? item.description.substring(0, 35) + '...'
@@ -81,17 +113,6 @@ const Cart = () => {
                     </Text>
                     <View style={styles.cartView}>
                       <Text style={styles.itemPrice}>{'$ ' + item?.price}</Text>
-                      <TouchableOpacity
-                        style={styles.addCart}
-                        onPress={() => {
-                          dispatch(setCartData(item));
-                        }}>
-                        <Image
-                          source={require('../assets/plus.png')}
-                          style={{height: 12, width: 12}}
-                        />
-                      </TouchableOpacity>
-                      <Text style={styles.qtyTxt}>{item?.qty}</Text>
                       <TouchableOpacity
                         style={styles.minusCart}
                         onPress={() => {
@@ -106,6 +127,19 @@ const Cart = () => {
                           style={{height: 12, width: 12}}
                         />
                       </TouchableOpacity>
+
+                      <Text style={styles.qtyTxt}>{item?.qty}</Text>
+
+                      <TouchableOpacity
+                        style={styles.addCart}
+                        onPress={() => {
+                          dispatch(setCartData(item));
+                        }}>
+                        <Image
+                          source={require('../assets/plus.png')}
+                          style={{height: 12, width: 12}}
+                        />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -114,14 +148,15 @@ const Cart = () => {
           );
         }}
         ListEmptyComponent={() => {
-          return(
-            <EmptyView msgText={'No data found'}/>
-          )
+          return <EmptyView msgText={'No Items In Cart'} />;
           // return isLoading === false ? (
           //   <EmptyView msgText={'No data found'} />
           // ) : null;
         }}
       />
+      {cartItems?.length > 0 && (
+        <CheckoutLayout items={cartItems?.length} total={getTotal()} />
+      )}
     </View>
   );
 };
@@ -138,7 +173,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    right: 10,
+    right: 90,
     top: 0,
   },
   qtyTxt: {
@@ -158,7 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    right: 90,
+    right: 10,
     top: 0,
   },
   cartView: {
@@ -200,5 +235,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor:"#fff"
   },
 });

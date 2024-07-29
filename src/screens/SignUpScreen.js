@@ -13,6 +13,7 @@ import CommonButton from '../common/CommonButton';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../common/Loader';
+import firestore from '@react-native-firebase/firestore';
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -22,7 +23,7 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [badName, setBadName] = useState(false);
-  const [badEmail, setBadEmail] = useState("");
+  const [badEmail, setBadEmail] = useState('');
   const [badPhoneNumber, setBadPhoneNumber] = useState('');
   const [badPassword, setBadPassword] = useState(false);
   const [badConfirmPassword, setBadConfirmPassword] = useState(false);
@@ -38,15 +39,15 @@ const SignUpScreen = () => {
     } else {
       setBadName(false);
       if (email === '') {
-        setBadEmail("Please Enter Email");
+        setBadEmail('Please Enter Email');
         isValid = false;
         setIsLoading(false);
-      } else if(!emailReg.test(email)) {
-        setBadEmail("Please Enter Valid Email");
+      } else if (!emailReg.test(email)) {
+        setBadEmail('Please Enter Valid Email');
         isValid = false;
         setIsLoading(false);
-      }else{
-        setBadEmail("")
+      } else {
+        setBadEmail('');
         isValid = true;
         if (phoneNumber === '') {
           setBadPhoneNumber('Please Enter Phone Number');
@@ -78,24 +79,40 @@ const SignUpScreen = () => {
               setBadConfirmPassword(false);
               // setIsLoading(false)
               setTimeout(() => {
-                saveData();
+                // saveData();
+                addUser();
               }, 1000);
-              }
             }
           }
         }
       }
     }
-
-  const saveData = async () => {
-    await AsyncStorage.setItem('NAME', name);
-    await AsyncStorage.setItem('EMAIL', email);
-    await AsyncStorage.setItem('MOBILE', phoneNumber);
-    await AsyncStorage.setItem('PASSWORD', password);
-    console.log('data saved----------->', name, email, phoneNumber, password);
-    // setIsLoading(false)
-    navigation.navigate("LoginScreen");
   };
+
+  const addUser = () => {
+    firestore()
+      .collection('Users')
+      .add({
+        name: name,
+        email: email,
+        mobile: phoneNumber,
+        password: password,
+      })
+      .then(() => {
+        console.log('User added!');
+        navigation.navigate('LoginScreen');
+      });
+  };
+
+  // const saveData = async () => {
+  //   await AsyncStorage.setItem('NAME', name);
+  //   await AsyncStorage.setItem('EMAIL', email);
+  //   await AsyncStorage.setItem('MOBILE', phoneNumber);
+  //   await AsyncStorage.setItem('PASSWORD', password);
+  //   console.log('data saved----------->', name, email, phoneNumber, password);
+  //   // setIsLoading(false)
+  //   navigation.navigate('LoginScreen');
+  // };
 
   return (
     <View style={styles.container}>
@@ -105,7 +122,7 @@ const SignUpScreen = () => {
           style={styles.logo}
         />
         <Text style={styles.loginText}>Create New Account</Text>
-       
+
         <View style={{marginTop: 10}}>
           <View style={styles.textInput}>
             <Image
@@ -115,6 +132,7 @@ const SignUpScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Full Name"
+              placeholderTextColor={'#888'}
               value={name}
               onChangeText={txt => setName(txt)}
             />
@@ -130,13 +148,12 @@ const SignUpScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Email"
+              placeholderTextColor={'#888'}
               value={email}
               onChangeText={txt => setEmail(txt)}
             />
           </View>
-          {badEmail != '' && (
-            <Text style={styles.errorTxt}>{badEmail}</Text>
-          )}
+          {badEmail != '' && <Text style={styles.errorTxt}>{badEmail}</Text>}
           <View style={styles.textInput}>
             <Image
               source={require('../assets/phone.png')}
@@ -145,6 +162,7 @@ const SignUpScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Phone Number"
+              placeholderTextColor={'#888'}
               keyboardType={'number-pad'}
               value={phoneNumber}
               onChangeText={txt => setPhoneNumber(txt)}
@@ -161,6 +179,7 @@ const SignUpScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Password"
+              placeholderTextColor={'#888'}
               // secureTextEntry={password}
               value={password}
               onChangeText={txt => setPassword(txt)}
@@ -177,6 +196,7 @@ const SignUpScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Confirm Password"
+              placeholderTextColor={'#888'}
               value={confirmPassword}
               onChangeText={txt => setConfirmPassword(txt)}
             />
@@ -200,13 +220,13 @@ const SignUpScreen = () => {
           <TouchableOpacity
             style={{marginBottom: 40}}
             onPress={() => {
-              navigation.navigate("LoginScreen");
+              navigation.navigate('LoginScreen');
             }}>
             <Text style={styles.loginTxt}>{'Login'}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Loader modalVisible={isLoading} />
+      {/* <Loader modalVisible={isLoading} /> */}
     </View>
   );
 };

@@ -43,6 +43,7 @@ const Home = () => {
         setIsLoading(false);
       });
   };
+  // console.log("11111111111", products);
   return (
     <View style={styles.container}>
       <Header
@@ -65,7 +66,7 @@ const Home = () => {
         renderItem={({item, index}) => {
           return (
             <TouchableOpacity
-              activeOpacity={0.8}
+              activeOpacity={0.9}
               style={styles.productView}
               onPress={() => {
                 navigation.navigate('ProductDetail', {data: item});
@@ -86,7 +87,7 @@ const Home = () => {
                         item?.title
                       }
                     </Text>
-                    <Text style={{}} numberOfLines={2}>
+                    <Text style={{color:"#888"}} numberOfLines={2}>
                       {
                         //    item.description.length > 35
                         //     ? item.description.substring(0, 35) + '...'
@@ -144,5 +145,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor:"#fff"
   },
 });

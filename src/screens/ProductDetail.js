@@ -27,6 +27,12 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
   const [qty, setQty] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  const toggleWishlist = () => {
+    setIsInWishlist(!isInWishlist);
+    dispatch(setWishListData(route?.params?.data));
+  };
 
   const checkUserStatus = async () => {
     let isUserLoggedIn = false;
@@ -70,17 +76,6 @@ const ProductDetail = () => {
               {'$ ' + route?.params?.data?.price}
             </Text>
             <TouchableOpacity
-              style={styles.addCart}
-              onPress={() => {
-                setQty(qty + 1);
-              }}>
-              <Image
-                source={require('../assets/plus.png')}
-                style={{height: 12, width: 12}}
-              />
-            </TouchableOpacity>
-            <Text style={styles.qtyTxt}>{qty}</Text>
-            <TouchableOpacity
               style={styles.minusCart}
               onPress={() => {
                 if (qty > 1) {
@@ -92,21 +87,43 @@ const ProductDetail = () => {
                 style={{height: 12, width: 12}}
               />
             </TouchableOpacity>
+
+            <Text style={styles.qtyTxt}>{qty}</Text>
+
+            <TouchableOpacity
+              style={styles.addCart}
+              onPress={() => {
+                setQty(qty + 1);
+              }}>
+              <Image
+                source={require('../assets/plus.png')}
+                style={{height: 12, width: 12}}
+              />
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.wishListView}
             onPress={() => {
-              if (!checkUserStatus()) {
-                dispatch(setWishListData(route?.params?.data));
-              } else {
-                setModalVisible(true);
-              }
+              toggleWishlist();
+              // if (!checkUserStatus()) {
+              // dispatch(setWishListData(route?.params?.data));
+              // } else {
+              //   setModalVisible(true);
+              // }
             }}>
             <Image
-              source={require('../assets/heart.png')}
-              style={{height: 28, width: 28}}
+              source={
+                isInWishlist
+                  ? require('../assets/heart_fill.png')
+                  : require('../assets/heart.png')
+              }
+              style={{
+                height: 28,
+                width: 28,
+                tintColor: isInWishlist === true ? '#121481' : '#000',
+              }}
             />
           </TouchableOpacity>
 
@@ -115,22 +132,22 @@ const ProductDetail = () => {
             bgColor={'#121481'}
             textColor={'#ffffff'}
             onPress={() => {
-              if (!checkUserStatus()) {
-                dispatch(
-                  setCartData({
-                    category: route?.params?.data?.category,
-                    description: route?.params?.data?.description,
-                    id: route?.params?.data?.id,
-                    image: route?.params?.data?.image,
-                    price: route?.params?.data?.price,
-                    qty: qty,
-                    rating: route?.params?.data?.rating,
-                    title: route?.params?.data?.title,
-                  }),
-                );
-              } else {
-                setModalVisible(true);
-              }
+              // if (!checkUserStatus()) {
+              dispatch(
+                setCartData({
+                  category: route?.params?.data?.category,
+                  description: route?.params?.data?.description,
+                  id: route?.params?.data?.id,
+                  image: route?.params?.data?.image,
+                  price: route?.params?.data?.price,
+                  qty: qty,
+                  rating: route?.params?.data?.rating,
+                  title: route?.params?.data?.title,
+                }),
+              );
+              // } else {
+              //   setModalVisible(true);
+              // }
               // dispatch(setCartData(route?.params?.data));
             }}
           />
@@ -156,7 +173,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    right: 30,
+    right: 110,
     top: 0,
   },
   qtyTxt: {
@@ -176,7 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    right: 110,
+    right: 30,
     top: 0,
   },
   wishListView: {

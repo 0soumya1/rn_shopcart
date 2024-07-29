@@ -14,6 +14,7 @@ import CommonButton from '../common/CommonButton';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../common/Loader';
+import firestore from '@react-native-firebase/firestore';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -31,22 +32,22 @@ const LoginScreen = () => {
     useCallback(() => {
       setEmail('');
       setPassword('');
-    }, [])
+    }, []),
   );
 
   const login = () => {
     const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     setIsLoading(true);
     if (email === '') {
-      setBadEmail("Please Enter Email");
+      setBadEmail('Please Enter Email');
       isValid = false;
       setIsLoading(false);
-    } else if(!emailReg.test(email)) {
-      setBadEmail("Please Enter Valid Email");
+    } else if (!emailReg.test(email)) {
+      setBadEmail('Please Enter Valid Email');
       isValid = false;
       setIsLoading(false);
-    }else{
-      setBadEmail("")
+    } else {
+      setBadEmail('');
       isValid = true;
       if (password === '') {
         setBadPassword(true);
@@ -54,24 +55,38 @@ const LoginScreen = () => {
       } else {
         setBadPassword(false);
         setTimeout(() => {
-          getData();
+          // getData();
+          loginUser();
         }, 1000);
       }
     }
   };
 
-  const getData = async () => {
-    const mEmail = await AsyncStorage.getItem('EMAIL');
-    const mPassword = await AsyncStorage.getItem('PASSWORD');
-    console.log('login data--------------->', mEmail, mPassword);
-    if (email === mEmail && password === mPassword) {
-      navigation.navigate('MainNavigation');
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
-      toast('Wrong Credentials');
-    }
+  const loginUser = () => {
+    firestore()
+      .collection('Users')
+      // Filter results
+      .where('email', '==', email)
+      .get()
+      .then(querySnapshot => {
+        /* ... */
+        console.log(querySnapshot.docs[0]?._data);
+        navigation.navigate('MainNavigation');
+      });
   };
+
+  // const getData = async () => {
+  //   const mEmail = await AsyncStorage.getItem('EMAIL');
+  //   const mPassword = await AsyncStorage.getItem('PASSWORD');
+  //   console.log('login data--------------->', mEmail, mPassword);
+  //   if (email === mEmail && password === mPassword) {
+  //     navigation.navigate('MainNavigation');
+  //     setIsLoading(false);
+  //   } else {
+  //     setIsLoading(false);
+  //     toast('Wrong Credentials');
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -106,7 +121,7 @@ const LoginScreen = () => {
           {badPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Password</Text>
           )} */}
-            <View style={styles.textInput}>
+          <View style={styles.textInput}>
             <Image
               source={require('../assets/email.png')}
               style={{width: 18, height: 18}}
@@ -114,14 +129,13 @@ const LoginScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Email"
+              placeholderTextColor={'#888'}
               value={email}
               onChangeText={txt => setEmail(txt)}
             />
           </View>
-          {badEmail != '' && (
-            <Text style={styles.errorTxt}>{badEmail}</Text>
-          )}
-            <View style={styles.textInput}>
+          {badEmail != '' && <Text style={styles.errorTxt}>{badEmail}</Text>}
+          <View style={styles.textInput}>
             <Image
               source={require('../assets/lock.png')}
               style={{width: 18, height: 18}}
@@ -129,6 +143,7 @@ const LoginScreen = () => {
             <TextInput
               style={styles.txt}
               placeholder="Enter Password"
+              placeholderTextColor={'#888'}
               // secureTextEntry={password}
               value={password}
               onChangeText={txt => setPassword(txt)}
@@ -159,7 +174,7 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Loader modalVisible={isLoading} />
+      {/* <Loader modalVisible={isLoading} /> */}
     </View>
   );
 };

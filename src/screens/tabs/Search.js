@@ -79,7 +79,15 @@ const Search = () => {
                 cornerRadius={8}
                 style={{marginVertical: 5}}>
                 <View style={styles.mainView}>
-                  <Image source={{uri: item?.image}} style={styles.itemImg} />
+                  {/* <Image source={{uri: item?.image}} style={styles.itemImg} /> */}
+                  {item?.image != null && item?.image != undefined  ? (
+                    <Image source={{uri: item?.image}} style={styles.itemImg} />
+                  ) : (
+                    <Image
+                      source={require('../../assets/default_image.png')}
+                      style={styles.itemImg}
+                    />
+                  )}
                   <View style={styles.TextView}>
                     <Text style={styles.itemTitle} numberOfLines={1}>
                       {
@@ -89,7 +97,7 @@ const Search = () => {
                         item?.title
                       }
                     </Text>
-                    <Text style={{}} numberOfLines={2}>
+                    <Text style={{color:"#888"}} numberOfLines={2}>
                       {
                         //    item.description.length > 35
                         //     ? item.description.substring(0, 35) + '...'
@@ -167,5 +175,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor:"#fff"
   },
 });

@@ -19,19 +19,26 @@ const Header = ({
   onClickLeftIcon,
   onClickRightIcon,
   isCart,
+  isHideBackButton,
+  isHideRightButton,
 }) => {
   const cartState = useSelector(state => state?.cart);
   // console.log(JSON.stringify(cartState) + cartState?.cartData?.length);
   return (
     <View style={styles.header}>
-      <TouchableOpacity
-        style={styles.btn}
-        onPress={() => {
-          onClickLeftIcon();
-        }}>
-        <Image source={leftIcon} style={styles.icon} />
-      </TouchableOpacity>
+      {/* {isHideBackButton == true ? null : ( */}
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={() => {
+            onClickLeftIcon();
+          }}>
+          <Image source={leftIcon} style={styles.icon} />
+        </TouchableOpacity>
+      {/* )} */}
+
       <Text style={styles.title}>{title}</Text>
+
+      {/* {isHideRightButton == true ? null : ( */}
       <TouchableOpacity
         style={styles.btn}
         onPress={() => {
@@ -39,12 +46,13 @@ const Header = ({
         }}>
         <Image source={rightIcon} style={styles.icon} />
 
-        {isCart === true && cartState?.cartData?.length != '' &&  (
+        {isCart === true && cartState?.cartData?.length != '' && (
           <View style={styles.cartCount}>
             <Text style={styles.cartTxt}>{cartState?.cartData?.length}</Text>
           </View>
         )}
       </TouchableOpacity>
+       {/* )} */}
     </View>
   );
 };
@@ -92,5 +100,6 @@ const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 22,
+    textAlign:"center"
   },
 });

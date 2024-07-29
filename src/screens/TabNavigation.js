@@ -38,7 +38,7 @@ const TabNavigation = () => {
       keyboardDidShowListener.remove();
     };
   }, []);
-  
+
   return (
     <View style={styles.container}>
       {selectedTab == 0 ? (
@@ -65,7 +65,10 @@ const TabNavigation = () => {
                   ? require('../assets/home_fill.png')
                   : require('../assets/home.png')
               }
-              style={styles.tabIcon}
+              style={[
+                styles.tabIcon,
+                {tintColor: selectedTab == 0 ? '#121481' : '#121481'},
+              ]}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -79,9 +82,10 @@ const TabNavigation = () => {
                   ? require('../assets/search_fill.png')
                   : require('../assets/search.png')
               }
-              style={
-                selectedTab == 1 ? {width: 33, height: 33} : styles.tabIcon
-              }
+              style={[
+                selectedTab == 1 ? {width: 33, height: 33} : styles.tabIcon,
+                {tintColor: selectedTab == 1 ? '#121481' : '#121481'},
+              ]}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -95,7 +99,10 @@ const TabNavigation = () => {
                   ? require('../assets/heart_fill.png')
                   : require('../assets/heart.png')
               }
-              style={styles.tabIcon}
+              style={[
+                styles.tabIcon,
+                {tintColor: selectedTab == 2 ? '#121481' : '#121481'},
+              ]}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -109,7 +116,10 @@ const TabNavigation = () => {
                   ? require('../assets/notification_fill.png')
                   : require('../assets/notification.png')
               }
-              style={styles.tabIcon}
+              style={[
+                styles.tabIcon,
+                {tintColor: selectedTab == 3 ? '#121481' : '#121481'},
+              ]}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -123,7 +133,10 @@ const TabNavigation = () => {
                   ? require('../assets/user_fill.png')
                   : require('../assets/user.png')
               }
-              style={styles.tabIcon}
+              style={[
+                styles.tabIcon,
+                {tintColor: selectedTab == 4 ? '#121481' : '#121481'},
+              ]}
             />
           </TouchableOpacity>
         </View>
@@ -146,7 +159,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F7F8',
   },
   bottomTab: {
     width: '20%',
