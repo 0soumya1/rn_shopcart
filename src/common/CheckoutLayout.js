@@ -13,8 +13,19 @@ const CheckoutLayout = ({total, items}) => {
   return (
     <View style={styles.container}>
       <View style={styles.tab}>
-        <Text style={{color: '#000', fontSize: 16}}>{`Items : ${items}`}</Text>
-        <Text style={{color: '#000', fontSize: 18, fontWeight: '600'}}>
+        <Text
+          style={{
+            color: '#000',
+            fontSize: 16,
+            fontWeight: '500',
+          }}>{`Items : ${items}`}</Text>
+        <Text
+          style={{
+            color: '#000',
+            fontSize: 18,
+            fontWeight: '600',
+            lineHeight: 30,
+          }}>
           {'Total : $ ' + total}
         </Text>
       </View>

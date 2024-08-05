@@ -14,24 +14,17 @@ import {useNavigation} from '@react-navigation/native';
 const AskForLoginModal = ({
   modalVisible,
   onRequestClose,
-  onClickLogin,
-  onClickSignUp,
+  onClickLoginSignUp,
+  onCancel,
 }) => {
   const navigation = useNavigation();
-//   const [modalClose, setModalClose] = useState(false);
-
-//   const closeModal = () => {
-//     setModalClose(false);
-//   };
   return (
     <Modal
       visible={modalVisible}
       transparent={true}
       animationType="slide"
-        onRequestClose={onRequestClose}
-    //   onRequestClose={() => {
-    //     setModalClose(!modalClose);
-    //   }}
+      onRequestClose={onRequestClose}
+     
     >
       <TouchableOpacity
         activeOpacity={0.9}
@@ -39,23 +32,24 @@ const AskForLoginModal = ({
         onPress={onRequestClose}>
         <TouchableWithoutFeedback>
           <View style={styles.mainView}>
-            <View style={{marginBottom: 30}}>
+            <View style={{marginBottom: 30, marginTop: 10}}>
+              <Text style={styles.txt}>
+                {'Want to Add Product in Cart or WishList?\nPlease Login or Sign Up'}
+              </Text>
               <CommonButton
-                title={'Login To ShopCart'}
+                title={'Login or Sign Up'}
                 bgColor={'#121481'}
                 textColor={'#ffffff'}
                 onPress={() => {
-                    // closeModal()
-                  navigation.navigate('LoginScreen');
+                  onClickLoginSignUp();
                 }}
               />
               <CommonButton
-                title={'Create Account'}
-                bgColor={'#121481'}
+                title={'Cancel'}
+                bgColor={'#888'}
                 textColor={'#ffffff'}
                 onPress={() => {
-                    // closeModal()
-                  navigation.navigate('SignUpScreen');
+                  onCancel();
                 }}
               />
             </View>
@@ -69,6 +63,13 @@ const AskForLoginModal = ({
 export default AskForLoginModal;
 
 const styles = StyleSheet.create({
+  txt: {
+    color: '#000',
+    fontSize: 17,
+    textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 24,
+  },
   mainView: {
     backgroundColor: '#fff',
     borderRadius: 10,

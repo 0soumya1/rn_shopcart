@@ -28,21 +28,53 @@ const ProductDetail = () => {
   const [qty, setQty] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
-
-  const toggleWishlist = () => {
+  
+  const addToWishlist = () => {
     setIsInWishlist(!isInWishlist);
     dispatch(setWishListData(route?.params?.data));
   };
 
-  const checkUserStatus = async () => {
-    let isUserLoggedIn = false;
-    const status = await AsyncStorage.getItem('IS_USER_LOGGED_IN');
-    if (status === null) {
-      isUserLoggedIn = false;
+  const checkUserStatusForWishList = async () => {
+    let userId = await AsyncStorage.getItem('USERID');
+    if (userId != null) {
+      setModalVisible(false)
+      addToWishlist();
     } else {
-      isUserLoggedIn = true;
+      setModalVisible(true);
     }
-    return isUserLoggedIn;
+  }
+
+  const addToCart = () => {
+    dispatch(
+      setCartData({
+        category: route?.params?.data?.category,
+        description: route?.params?.data?.description,
+        id: route?.params?.data?.id,
+        image: route?.params?.data?.image,
+        price: route?.params?.data?.price,
+        qty: qty,
+        rating: route?.params?.data?.rating,
+        title: route?.params?.data?.title,
+      }),
+    );
+  };
+
+  const checkUserStatusForCart = async () => {
+    let userId = await AsyncStorage.getItem('USERID');
+    if (userId != null) {
+      setModalVisible(false)
+      addToCart();
+    } else {
+      setModalVisible(true);
+    }
+    // let isUserLoggedIn = false;
+    // const status = await AsyncStorage.getItem('IS_USER_LOGGED_IN');
+    // if (status === null) {
+    //   isUserLoggedIn = false;
+    // } else {
+    //   isUserLoggedIn = true;
+    // }
+    // return isUserLoggedIn;
   };
 
   return (
@@ -106,9 +138,10 @@ const ProductDetail = () => {
             activeOpacity={0.7}
             style={styles.wishListView}
             onPress={() => {
-              toggleWishlist();
+              checkUserStatusForWishList();
+              // toggleWishlist();
               // if (!checkUserStatus()) {
-              // dispatch(setWishListData(route?.params?.data));
+              //   dispatch(setWishListData(route?.params?.data));
               // } else {
               //   setModalVisible(true);
               // }
@@ -132,19 +165,20 @@ const ProductDetail = () => {
             bgColor={'#121481'}
             textColor={'#ffffff'}
             onPress={() => {
+              checkUserStatusForCart()
               // if (!checkUserStatus()) {
-              dispatch(
-                setCartData({
-                  category: route?.params?.data?.category,
-                  description: route?.params?.data?.description,
-                  id: route?.params?.data?.id,
-                  image: route?.params?.data?.image,
-                  price: route?.params?.data?.price,
-                  qty: qty,
-                  rating: route?.params?.data?.rating,
-                  title: route?.params?.data?.title,
-                }),
-              );
+              //   dispatch(
+              //     setCartData({
+              //       category: route?.params?.data?.category,
+              //       description: route?.params?.data?.description,
+              //       id: route?.params?.data?.id,
+              //       image: route?.params?.data?.image,
+              //       price: route?.params?.data?.price,
+              //       qty: qty,
+              //       rating: route?.params?.data?.rating,
+              //       title: route?.params?.data?.title,
+              //     }),
+              //   );
               // } else {
               //   setModalVisible(true);
               // }
@@ -156,6 +190,13 @@ const ProductDetail = () => {
       <AskForLoginModal
         modalVisible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
+        onClickLoginSignUp={() => {
+          setModalVisible(false);
+          navigation.navigate('LoginScreen');
+        }}
+        onCancel={() => {
+          setModalVisible(false);
+        }}
       />
     </View>
   );

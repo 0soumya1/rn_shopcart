@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../common/Loader';
 import firestore from '@react-native-firebase/firestore';
+import uuid from 'react-native-uuid';
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -28,6 +29,8 @@ const SignUpScreen = () => {
   const [badPassword, setBadPassword] = useState(false);
   const [badConfirmPassword, setBadConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hidePass, setHidePass] = useState(true);
+  const [hideConfirmPass, setConfirmHidePass] = useState(true);
 
   const signUP = () => {
     const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -80,7 +83,7 @@ const SignUpScreen = () => {
               // setIsLoading(false)
               setTimeout(() => {
                 // saveData();
-                addUser();
+                registerUser();
               }, 1000);
             }
           }
@@ -89,18 +92,27 @@ const SignUpScreen = () => {
     }
   };
 
-  const addUser = () => {
+  const registerUser = () => {
+    setIsLoading(true)
+    const userId = uuid.v4();
     firestore()
       .collection('Users')
-      .add({
+      .doc(userId)
+      .set({
         name: name,
         email: email,
         mobile: phoneNumber,
         password: password,
+        userId: userId,
       })
-      .then(() => {
+      .then(res => {
+        setIsLoading(false)
         console.log('User added!');
         navigation.navigate('LoginScreen');
+      })
+      .catch(error => {
+        setIsLoading(false)
+        console.log(error);
       });
   };
 
@@ -177,13 +189,26 @@ const SignUpScreen = () => {
               style={{width: 18, height: 18}}
             />
             <TextInput
-              style={styles.txt}
+              style={[styles.txt, {width: '90%'}]}
               placeholder="Enter Password"
               placeholderTextColor={'#888'}
-              // secureTextEntry={password}
+              secureTextEntry={hidePass}
               value={password}
               onChangeText={txt => setPassword(txt)}
             />
+            <TouchableOpacity onPress={() => setHidePass(!hidePass)}>
+              {hidePass ? (
+                <Image
+                  source={require('../assets/eye_close.png')}
+                  style={{width: 20, height: 20}}
+                />
+              ) : (
+                <Image
+                  source={require('../assets/eye.png')}
+                  style={{width: 20, height: 20}}
+                />
+              )}
+            </TouchableOpacity>
           </View>
           {badPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Password</Text>
@@ -194,12 +219,27 @@ const SignUpScreen = () => {
               style={{width: 18, height: 18}}
             />
             <TextInput
-              style={styles.txt}
+              style={[styles.txt, {width: '90%'}]}
               placeholder="Enter Confirm Password"
               placeholderTextColor={'#888'}
+              secureTextEntry={hideConfirmPass}
               value={confirmPassword}
               onChangeText={txt => setConfirmPassword(txt)}
             />
+            <TouchableOpacity
+              onPress={() => setConfirmHidePass(!hideConfirmPass)}>
+              {hideConfirmPass ? (
+                <Image
+                  source={require('../assets/eye_close.png')}
+                  style={{width: 20, height: 20}}
+                />
+              ) : (
+                <Image
+                  source={require('../assets/eye.png')}
+                  style={{width: 20, height: 20}}
+                />
+              )}
+            </TouchableOpacity>
           </View>
           {badConfirmPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Confirm Password</Text>
@@ -226,7 +266,7 @@ const SignUpScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      {/* <Loader modalVisible={isLoading} /> */}
+      <Loader modalVisible={isLoading} />
     </View>
   );
 };
@@ -252,7 +292,7 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     flexDirection: 'row',
-    marginTop: 15,
+    marginTop: 20,
     alignSelf: 'center',
   },
   errorTxt: {
@@ -296,8 +336,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     resizeMode: 'contain',
     alignSelf: 'center',
     marginTop: 40,

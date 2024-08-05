@@ -105,7 +105,7 @@ const TabNavigation = () => {
               ]}
             />
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.bottomTab}
             onPress={() => {
               setSelectedTab(3);
@@ -121,7 +121,7 @@ const TabNavigation = () => {
                 {tintColor: selectedTab == 3 ? '#121481' : '#121481'},
               ]}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.bottomTab}
             onPress={() => {

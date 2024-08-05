@@ -79,7 +79,7 @@ const WishList = () => {
         }}
         ListEmptyComponent={() => {
           return(
-            <EmptyView msgText={'No data found'}/>
+            <EmptyView msgText={'No data found'} isCheckout={false}/>
           )
           // return isLoading === false ? (
           //   <EmptyView msgText={'No data found'} />

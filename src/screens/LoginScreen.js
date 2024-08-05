@@ -11,6 +11,7 @@ import {
 import React, {useCallback, useState} from 'react';
 import CustomTextInput from '../common/CustomTextInput';
 import CommonButton from '../common/CommonButton';
+import CheckBox from 'react-native-check-box';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../common/Loader';
@@ -23,6 +24,8 @@ const LoginScreen = () => {
   const [badEmail, setBadEmail] = useState(false);
   const [badPassword, setBadPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hidePass, setHidePass] = useState(true);
+  const [isCheck, setIsCheck] = useState(true);
 
   const toast = msg => {
     return ToastAndroid.show(msg, ToastAndroid.LONG, ToastAndroid.BOTTOM);
@@ -54,25 +57,49 @@ const LoginScreen = () => {
         setIsLoading(false);
       } else {
         setBadPassword(false);
-        setTimeout(() => {
-          // getData();
-          loginUser();
-        }, 1000);
+        if (isCheck === false) {
+          toast("Please agree to ShopCart's Privacy Policy");
+          setIsLoading(false);
+        } else {
+          setTimeout(() => {
+            // getData();
+            loginUser();
+          }, 1000);
+        }
       }
     }
   };
 
   const loginUser = () => {
+    setIsLoading(true);
     firestore()
       .collection('Users')
       // Filter results
       .where('email', '==', email)
       .get()
-      .then(querySnapshot => {
-        /* ... */
-        console.log(querySnapshot.docs[0]?._data);
-        navigation.navigate('MainNavigation');
+      .then(snapshot => {
+        setIsLoading(false);
+        if (snapshot.docs[0] != []) {
+          if (snapshot.docs[0]?._data?.password === password) {
+            goToNextScreen(snapshot.docs[0]?._data);
+          }else{
+            toast('Wrong Credentials');
+          }
+        }
+        // console.log(snapshot.docs[0]?._data);
+      })
+      .catch(error => {
+        setIsLoading(false);
+        console.log(error);
       });
+  };
+
+  const goToNextScreen = async data => {
+    await AsyncStorage.setItem('NAME', data?.name);
+    await AsyncStorage.setItem('EMAIL', data?.email);
+    await AsyncStorage.setItem('MOBILE', data?.mobile);
+    await AsyncStorage.setItem('USERID', data?.userId);
+    navigation.navigate('MainNavigation');
   };
 
   // const getData = async () => {
@@ -141,17 +168,64 @@ const LoginScreen = () => {
               style={{width: 18, height: 18}}
             />
             <TextInput
-              style={styles.txt}
+              style={[styles.txt, {width: '90%'}]}
               placeholder="Enter Password"
               placeholderTextColor={'#888'}
-              // secureTextEntry={password}
+              secureTextEntry={hidePass}
               value={password}
               onChangeText={txt => setPassword(txt)}
             />
+            <TouchableOpacity onPress={() => setHidePass(!hidePass)}>
+              {hidePass ? (
+                <Image
+                  source={require('../assets/eye_close.png')}
+                  style={{width: 20, height: 20}}
+                />
+              ) : (
+                <Image
+                  source={require('../assets/eye.png')}
+                  style={{width: 20, height: 20}}
+                />
+              )}
+            </TouchableOpacity>
           </View>
           {badPassword === true && (
             <Text style={styles.errorTxt}>Please Enter Password</Text>
           )}
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            paddingHorizontal: 30,
+            marginTop: 25,
+          }}>
+          <CheckBox
+            style={{}}
+            onClick={() => setIsCheck(!isCheck)}
+            isChecked={isCheck}
+            checkedCheckBoxColor={'#121481'}
+            uncheckedCheckBoxColor={'#121481'}
+          />
+          <Text
+            style={{
+              color: '#000',
+              fontSize: 16,
+            }}>
+            {"By Login, you agree to ShopCart's"}
+          </Text>
+          <TouchableOpacity>
+            <Text
+              style={{
+                color: '#121481',
+                fontSize: 16,
+                fontWeight: '500',
+              }}>
+              {'Privacy Policy'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <CommonButton
@@ -174,7 +248,7 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      {/* <Loader modalVisible={isLoading} /> */}
+      <Loader modalVisible={isLoading} />
     </View>
   );
 };
@@ -200,7 +274,7 @@ const styles = StyleSheet.create({
   },
   accountView: {
     flexDirection: 'row',
-    marginTop: 15,
+    marginTop: 20,
     alignSelf: 'center',
   },
   errorTxt: {
@@ -232,8 +306,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     resizeMode: 'contain',
     alignSelf: 'center',
     marginTop: 80,

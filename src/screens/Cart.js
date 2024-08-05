@@ -148,7 +148,7 @@ const Cart = () => {
           );
         }}
         ListEmptyComponent={() => {
-          return <EmptyView msgText={'No Items In Cart'} />;
+          return <EmptyView msgText={'No Items In Cart'} isCheckout={false}/>;
           // return isLoading === false ? (
           //   <EmptyView msgText={'No data found'} />
           // ) : null;

@@ -1,6 +1,8 @@
 import {
+  Alert,
   FlatList,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -8,8 +10,9 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../common/Header';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
+  emptyCart,
   reduceCartData,
   removeCartData,
   setCartData,
@@ -19,16 +22,18 @@ import {useDispatch, useSelector} from 'react-redux';
 import CardView from 'react-native-cardview';
 import Loader from '../common/Loader';
 import CommonButton from '../common/CommonButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RazorpayCheckout from 'react-native-razorpay';
+import {setOrderData} from '../redux/slices/OrderSlice';
 
 const Checkout = () => {
   const navigation = useNavigation();
   const cartState = useSelector(state => state?.cart);
   const [cartItems, setCartItems] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState(0);
-  const [selectedAddress, setSelectedAddress] = useState(
-    'Please Select Address',
-  );
+  const [selectedAddress, setSelectedAddress] = useState('');
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     setCartItems(cartState?.cartData);
@@ -40,6 +45,93 @@ const Checkout = () => {
       total = total + item?.qty * item?.price;
     });
     return total.toFixed(0);
+  };
+
+  useEffect(() => {
+    getSelectedAddress();
+  }, [isFocused]);
+
+  const getSelectedAddress = async () => {
+    setSelectedAddress(await AsyncStorage.getItem('My_Address'));
+  };
+
+  const orderPlace = paymentId => {
+    const day = new Date().getDate();
+    const month = new Date().getMonth() + 1;
+    const year = new Date().getFullYear();
+    const hours = new Date().getHours();
+    const minutes = new Date().getMinutes();
+    const seconds = new Date().getSeconds();
+    let ampm = '';
+    if (hours > 12) {
+      ampm = 'pm';
+    } else {
+      ampm = 'am';
+    }
+
+    const data = {
+      items: cartItems,
+      amount: '$' + getTotal(),
+      address: selectedAddress,
+      paymentId: paymentId,
+      paymentStatus: selectedMethod == 3 ? 'Pending' : 'Success',
+      orderDate:
+        day +
+        '/' +
+        month +
+        '/' +
+        year +
+        ' ' +
+        hours +
+        ': ' +
+        minutes +
+        ': ' +
+        seconds +
+        ' ' +
+        ampm,
+    };
+    dispatch(setOrderData(data));
+    dispatch(emptyCart([]));
+    navigation.navigate('OrderSuccess');
+  };
+
+  const payNow = () => {
+    if (
+      cartItems != '' &&
+      cartItems != null &&
+      selectedAddress != null &&
+      selectedAddress != ''
+    ) {
+      var options = {
+        description: 'Credits towards consultation',
+        image: 'https://i.imgur.com/3g7nmJC.png',
+        currency: 'INR',
+        key: 'rzp_test_WAYMtWq1G07zQr', // Your api key
+        amount: getTotal() * 1000,
+        name: 'Test User',
+        prefill: {
+          email: 'void@razorpay.com',
+          contact: '9191919191',
+          name: 'Razorpay Software',
+        },
+        theme: {color: '#121481'},
+      };
+      RazorpayCheckout.open(options)
+        .then(data => {
+          // handle success
+          // alert(`Success: ${data.razorpay_payment_id}`);
+          orderPlace(data.razorpay_payment_id);
+        })
+        .catch(error => {
+          // handle failure
+          // alert(`Error: ${error.code} | ${error.description}`);
+          Alert.alert(
+            "Order Couldn't be placed !!! Try with TEST CARD NUMBER = 4111 1111 1111 1111",
+          );
+        });
+    } else {
+      Alert.alert('Please Add Items and Select a Delivery Address');
+    }
   };
 
   return (
@@ -56,12 +148,14 @@ const Checkout = () => {
         }}
       />
 
-      <Text style={styles.addedItems}>{'Added Items :'}</Text>
-      <View>
+      <Text style={[styles.addedItems, {marginTop: 10}]}>
+        {'Added Items :'}
+      </Text>
+      <ScrollView showsVerticalScrollIndicator={false} style={{}}>
         <FlatList
           data={cartItems}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{marginTop: 10}}
+          contentContainerStyle={{marginTop: 5}}
           renderItem={({item, index}) => {
             return (
               <TouchableOpacity
@@ -144,122 +238,153 @@ const Checkout = () => {
             );
           }}
           ListEmptyComponent={() => {
-            return <EmptyView msgText={'No Items In Cart'} />;
+            return <EmptyView msgText={'No Items Added'} isCheckout={true} />;
             // return isLoading === false ? (
             //   <EmptyView msgText={'No data found'} />
             // ) : null;
           }}
         />
-      </View>
+      </ScrollView>
 
-      <View style={styles.priceView}>
-        <Text style={styles.addedItems}>Total :</Text>
-        <Text style={[styles.addedItems, {marginRight: 10, color: 'green'}]}>
-          {'$ ' + getTotal()}
+      <View style={{height: 470}}>
+        <View style={styles.priceView}>
+          <View style={{}}>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: 19,
+                fontWeight: '500',
+              }}>
+              {'Items : ' + cartItems?.length}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <Text
+              style={[
+                styles.addedItems,
+                {marginTop: 10, marginBottom: 10, left: 10},
+              ]}>
+              Total :
+            </Text>
+            <Text style={[styles.addedItems, {marginTop: 10, color: 'green'}]}>
+              {'$ ' + getTotal()}
+            </Text>
+          </View>
+        </View>
+        <Text style={[styles.addedItems, {marginTop: 10}]}>
+          Select Payment Mode :
         </Text>
-      </View>
-      <Text style={styles.addedItems}>Select Payment Mode :</Text>
-      <View>
-        <TouchableOpacity
-          style={styles.payment}
-          onPress={() => {
-            setSelectedMethod(0);
-          }}>
-          <Image
+        <View>
+          <TouchableOpacity
+            style={styles.payment}
+            onPress={() => {
+              setSelectedMethod(0);
+            }}>
+            <Image
+              style={[
+                styles.img,
+                {tintColor: selectedMethod == 0 ? '#121481' : '#000'},
+              ]}
+              source={
+                selectedMethod == 0
+                  ? require('../assets/radio-fill.png')
+                  : require('../assets/radio-button.png')
+              }
+            />
+            <Text style={styles.paymentTxt}>Credit Card</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.payment}
+            onPress={() => {
+              setSelectedMethod(1);
+            }}>
+            <Image
+              style={[
+                styles.img,
+                {tintColor: selectedMethod == 1 ? '#121481' : '#000'},
+              ]}
+              source={
+                selectedMethod == 1
+                  ? require('../assets/radio-fill.png')
+                  : require('../assets/radio-button.png')
+              }
+            />
+            <Text style={styles.paymentTxt}>Debit Card</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.payment}
+            onPress={() => {
+              setSelectedMethod(2);
+            }}>
+            <Image
+              style={[
+                styles.img,
+                {tintColor: selectedMethod == 2 ? '#121481' : '#000'},
+              ]}
+              source={
+                selectedMethod == 2
+                  ? require('../assets/radio-fill.png')
+                  : require('../assets/radio-button.png')
+              }
+            />
+            <Text style={styles.paymentTxt}>UPI</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.payment}
+            onPress={() => {
+              setSelectedMethod(3);
+            }}>
+            <Image
+              style={[
+                styles.img,
+                {tintColor: selectedMethod == 3 ? '#121481' : '#000'},
+              ]}
+              source={
+                selectedMethod == 3
+                  ? require('../assets/radio-fill.png')
+                  : require('../assets/radio-button.png')
+              }
+            />
+            <Text style={styles.paymentTxt}>Cash on Delivery</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.AddressView}>
+          <Text style={styles.addedItems}>Delivery Address :</Text>
+          <Text
             style={[
-              styles.img,
-              {tintColor: selectedMethod == 0 ? '#121481' : '#000'},
+              styles.addedItems,
+              {color: '#121481', textDecorationLine: 'underline'},
             ]}
-            source={
-              selectedMethod == 0
-                ? require('../assets/radio-fill.png')
-                : require('../assets/radio-button.png')
-            }
-          />
-          <Text style={styles.paymentTxt}>Credit Card</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.payment}
-          onPress={() => {
-            setSelectedMethod(1);
-          }}>
-          <Image
-            style={[
-              styles.img,
-              {tintColor: selectedMethod == 1 ? '#121481' : '#000'},
-            ]}
-            source={
-              selectedMethod == 1
-                ? require('../assets/radio-fill.png')
-                : require('../assets/radio-button.png')
-            }
-          />
-          <Text style={styles.paymentTxt}>Debit Card</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.payment}
-          onPress={() => {
-            setSelectedMethod(2);
-          }}>
-          <Image
-            style={[
-              styles.img,
-              {tintColor: selectedMethod == 2 ? '#121481' : '#000'},
-            ]}
-            source={
-              selectedMethod == 2
-                ? require('../assets/radio-fill.png')
-                : require('../assets/radio-button.png')
-            }
-          />
-          <Text style={styles.paymentTxt}>UPI</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.payment}
-          onPress={() => {
-            setSelectedMethod(3);
-          }}>
-          <Image
-            style={[
-              styles.img,
-              {tintColor: selectedMethod == 3 ? '#121481' : '#000'},
-            ]}
-            source={
-              selectedMethod == 3
-                ? require('../assets/radio-fill.png')
-                : require('../assets/radio-button.png')
-            }
-          />
-          <Text style={styles.paymentTxt}>Cash on Delivery</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.AddressView}>
-        <Text style={styles.addedItems}>Address :</Text>
+            onPress={() => {
+              navigation.navigate('Addresses');
+            }}>
+            Edit Address
+          </Text>
+        </View>
+
         <Text
           style={[
-            styles.addedItems,
-            {color: '#121481', textDecorationLine: 'underline'},
+            styles.paymentTxt,
+            {paddingHorizontal: 10, paddingVertical: 10},
           ]}
-          onPress={() => {
-            navigation.navigate('Addresses');
-          }}>
-          Edit Address
+          numberOfLines={4}>
+          {selectedAddress != '' && selectedAddress != null
+            ? selectedAddress
+            : 'Please Select Address'}
         </Text>
-      </View>
-
-      <Text
-        style={[
-          styles.paymentTxt,
-          {paddingHorizontal: 10, paddingVertical: 10},
-        ]}>
-        {selectedAddress}
-      </Text>
-      <View style={{marginTop: 10}}>
-        <CommonButton
-          bgColor={'green'}
-          title={'Pay & Order'}
-          textColor={'#fff'}
-        />
+        <View style={{}}>
+          <CommonButton
+            bgColor={'green'}
+            title={'Pay & Order'}
+            textColor={'#fff'}
+            onPress={() => {
+              payNow();
+            }}
+          />
+        </View>
       </View>
     </View>
   );
@@ -286,7 +411,7 @@ const styles = StyleSheet.create({
   payment: {
     flexDirection: 'row',
     width: '90%',
-    marginTop: 20,
+    marginTop: 12,
     paddingHorizontal: 10,
     alignItems: 'center',
     gap: 10,
@@ -294,11 +419,12 @@ const styles = StyleSheet.create({
   priceView: {
     width: '100%',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'baseline',
     flexDirection: 'row',
-    height: 70,
+    // height: 100,
     borderBottomWidth: 0.4,
-    borderBlockColor: '#B7B7B7',
+    borderBottomColor: '#B7B7B7',
+    paddingHorizontal: 10,
   },
   addedItems: {
     fontSize: 19,
