@@ -9,17 +9,7 @@ import {
 } from 'react-native';
 
 const CommanModel = props => {
-  //   interface buttonViewProps {
-  //     onRequestClose: () => void;
-  //     onPressRightButton: () => void;
-  //     onPressLeftButton: () => void;
-  //     visible: boolean;
-  //     rightButtonText: any;
-  //     leftButtonText: any;
-  //     modelTitle: any;
-  //     description: any;
-  //   }
-
+  
   return (
     <Modal
       transparent={true}

@@ -1,4 +1,6 @@
 import {
+  Alert,
+  BackHandler,
   Image,
   ScrollView,
   StyleSheet,
@@ -16,15 +18,43 @@ const Profile = () => {
   const navigation = useNavigation();
   const [isOpenLogoutModal, setIsOpenLogoutModal] = useState(false);
   const [isOpenDeleteAcModal, setIsOpenDeleteAcModal] = useState(false);
-  const [name , setName] = useState('') 
-  const [email , setEmail] = useState('') 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true; // Prevent default behavior (exit app)
+      } else {
+        Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {text: 'YES', onPress: () => BackHandler.exitApp()},
+        ]);
+        return true; // Prevent default behavior (exit app)
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove(); // Clean up the event listener
+  }, [navigation]);
 
   useEffect(() => {
     getProfile();
   }, [isFocused]);
 
   const getProfile = async () => {
+    setUserId(await AsyncStorage.getItem('USERID'));
     setName(await AsyncStorage.getItem('NAME'));
     setEmail(await AsyncStorage.getItem('EMAIL'));
   };
@@ -51,15 +81,15 @@ const Profile = () => {
           {email}
         </Text>
 
-        <TouchableOpacity style={[styles.tab, {marginTop: 40}]}>
+        {/* <TouchableOpacity style={[styles.tab, {marginTop: 40}]}>
           <Text style={styles.txt}>Edit Profile</Text>
           <Image
             style={styles.next}
             source={require('../../assets/next.png')}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
-          style={[styles.tab, {marginTop: 10}]}
+          style={[styles.tab, {marginTop: 40}]}
           onPress={() => {
             navigation.navigate('Orders');
           }}>
@@ -87,28 +117,32 @@ const Profile = () => {
             source={require('../../assets/next.png')}
           />
         </TouchableOpacity> */}
-        <TouchableOpacity
-          style={[styles.tab, {marginTop: 10}]}
-          onPress={() => {
-            setIsOpenLogoutModal(true);
-          }}>
-          <Text style={styles.txt}>Logout</Text>
-          <Image
-            style={styles.next}
-            source={require('../../assets/next.png')}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, {marginTop: 10}]}
-          onPress={() => {
-            setIsOpenDeleteAcModal(true);
-          }}>
-          <Text style={styles.txt}>Delete Account</Text>
-          <Image
-            style={styles.next}
-            source={require('../../assets/next.png')}
-          />
-        </TouchableOpacity>
+        {userId != null && userId != '' && (
+          <>
+            <TouchableOpacity
+              style={[styles.tab, {marginTop: 10}]}
+              onPress={() => {
+                setIsOpenLogoutModal(true);
+              }}>
+              <Text style={styles.txt}>Logout</Text>
+              <Image
+                style={styles.next}
+                source={require('../../assets/next.png')}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, {marginTop: 10}]}
+              onPress={() => {
+                setIsOpenDeleteAcModal(true);
+              }}>
+              <Text style={styles.txt}>Delete Account</Text>
+              <Image
+                style={styles.next}
+                source={require('../../assets/next.png')}
+              />
+            </TouchableOpacity>
+          </>
+        )}
       </ScrollView>
       <LogoutModal
         onRequestClose={() => setIsOpenLogoutModal(false)}
@@ -127,7 +161,7 @@ const Profile = () => {
       <LogoutModal
         onRequestClose={() => setIsOpenDeleteAcModal(false)}
         onPressLeftButton={() => setIsOpenDeleteAcModal(false)}
-        onPressRightButton={async() => {
+        onPressRightButton={async () => {
           await AsyncStorage.clear();
           setIsOpenDeleteAcModal(false);
           navigation.navigate('LoginScreen');

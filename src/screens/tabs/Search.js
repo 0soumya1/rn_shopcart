@@ -6,13 +6,16 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  Alert,
+  BackHandler,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import Header from '../../common/Header';
 import {useNavigation} from '@react-navigation/native';
 import CardView from 'react-native-cardview';
 import Loader from '../../common/Loader';
+import EmptyView from '../../common/EmptyView';
 
 const Search = () => {
   const productState = useSelector(state => state?.products);
@@ -21,6 +24,32 @@ const Search = () => {
   const [searchedList, setSearchedList] = useState(oldData);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true; // Prevent default behavior (exit app)
+      } else {
+        Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {text: 'YES', onPress: () => BackHandler.exitApp()},
+        ]);
+        return true; // Prevent default behavior (exit app)
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove(); // Clean up the event listener
+  }, [navigation]);
 
   const filterData = txt => {
     setIsLoading(true);
@@ -52,7 +81,7 @@ const Search = () => {
         />
         <TextInput
           placeholder="Search Items here..."
-          style={{width: '90%'}}
+          style={{width: '90%', color:"#000"}}
           placeholderTextColor={'#888'}
           value={search}
           onChangeText={txt => {
@@ -111,6 +140,12 @@ const Search = () => {
               </CardView>
             </TouchableOpacity>
           );
+        }}
+        ListEmptyComponent={() => {
+          return <EmptyView msgText={'No data found'} isCheckout={false} />;
+          // return isLoading === false ? (
+          //   <EmptyView msgText={'No data found'} />
+          // ) : null;
         }}
         keyExtractor={item => item.id.toString()}
       />

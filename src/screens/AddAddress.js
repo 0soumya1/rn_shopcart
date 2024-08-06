@@ -1,5 +1,6 @@
 import {
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -47,43 +48,43 @@ const AddAddress = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSaveAddress = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     if (location == '') {
       setLocationErr('Please enter location');
-      setIsLoading(false)
+      setIsLoading(false);
     } else {
       setLocationErr('');
-      setIsLoading(false)
+      setIsLoading(false);
     }
 
     if (city == '') {
       setCityErr('Please enter city');
-      setIsLoading(false)
+      setIsLoading(false);
     } else {
       setCityErr('');
-      setIsLoading(false)
+      setIsLoading(false);
     }
 
     if (state == '') {
       setStateErr('Please enter state');
-      setIsLoading(false)
+      setIsLoading(false);
     } else {
       setStateErr('');
-      setIsLoading(false)
+      setIsLoading(false);
     }
 
     if (pinCode == '') {
       setPinCodeErr('Please enter pincode');
-      setIsLoading(false)
+      setIsLoading(false);
     } else if (pinCode != '' && pinCode.length < 6) {
       setPinCodeErr('Please enter valid pincode');
-      setIsLoading(false)
+      setIsLoading(false);
     } else if (pinCode != '' && pinCode.length > 6) {
       setPinCodeErr('Please enter valid pincode');
-      setIsLoading(false)
+      setIsLoading(false);
     } else if (pinCode != '' && pinCode.length == 6) {
       setPinCodeErr('');
-      setIsLoading(false)
+      setIsLoading(false);
     }
 
     if (
@@ -94,7 +95,7 @@ const AddAddress = () => {
       pinCode.length == 6 &&
       route?.params?.type == 'edit'
     ) {
-      setIsLoading(false)
+      setIsLoading(false);
       dispatch(
         updateAddress({
           location: location,
@@ -114,7 +115,7 @@ const AddAddress = () => {
       pinCode != '' &&
       pinCode.length == 6
     ) {
-      setIsLoading(false)
+      setIsLoading(false);
       dispatch(
         setAddressData({
           location: location,
@@ -145,116 +146,99 @@ const AddAddress = () => {
           null;
         }}
       />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Enter Location"
-        placeholderTextColor={'#888'}
-        value={location}
-        onChangeText={txt => setLocation(txt)}
-      />
-      {locationErr != '' && <Text style={styles.errorTxt}>{locationErr}</Text>}
-      <TextInput
-        style={[styles.textInput, {marginTop: 20}]}
-        placeholder="Enter City"
-        placeholderTextColor={'#888'}
-        value={city}
-        onChangeText={txt => setCity(txt)}
-      />
-      {cityErr != '' && <Text style={styles.errorTxt}>{cityErr}</Text>}
-      <TextInput
-        style={[styles.textInput, {marginTop: 20}]}
-        placeholder="Enter State"
-        placeholderTextColor={'#888'}
-        value={state}
-        onChangeText={txt => setState(txt)}
-      />
-      {stateErr != '' && <Text style={styles.errorTxt}>{stateErr}</Text>}
-      <TextInput
-        style={[styles.textInput, {marginTop: 20}]}
-        placeholder="Enter Pincode"
-        placeholderTextColor={'#888'}
-        keyboardType="number-pad"
-        value={pinCode}
-        onChangeText={txt => setPinCode(txt)}
-      />
-      {pinCodeErr != '' && <Text style={styles.errorTxt}>{pinCodeErr}</Text>}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          marginTop: 30,
-        }}>
-        <TouchableOpacity
-          style={styles.modeView}
-          onPress={() => {
-            setSelectedMethod(0);
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Enter Location"
+          placeholderTextColor={'#888'}
+          value={location}
+          onChangeText={txt => setLocation(txt)}
+        />
+        {locationErr != '' && (
+          <Text style={styles.errorTxt}>{locationErr}</Text>
+        )}
+        <TextInput
+          style={[styles.textInput, {marginTop: 20}]}
+          placeholder="Enter City"
+          placeholderTextColor={'#888'}
+          value={city}
+          onChangeText={txt => setCity(txt)}
+        />
+        {cityErr != '' && <Text style={styles.errorTxt}>{cityErr}</Text>}
+        <TextInput
+          style={[styles.textInput, {marginTop: 20}]}
+          placeholder="Enter State"
+          placeholderTextColor={'#888'}
+          value={state}
+          onChangeText={txt => setState(txt)}
+        />
+        {stateErr != '' && <Text style={styles.errorTxt}>{stateErr}</Text>}
+        <TextInput
+          style={[styles.textInput, {marginTop: 20}]}
+          placeholder="Enter Pincode"
+          placeholderTextColor={'#888'}
+          keyboardType="number-pad"
+          value={pinCode}
+          onChangeText={txt => setPinCode(txt)}
+        />
+      
+        {pinCodeErr != '' && <Text style={styles.errorTxt}>{pinCodeErr}</Text>}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            marginTop: 30,
           }}>
-          <Image
-            style={[
-              styles.img,
-              {tintColor: selectedMethod == 0 ? '#121481' : '#000'},
-            ]}
-            source={
-              selectedMethod == 0
-                ? require('../assets/radio-fill.png')
-                : require('../assets/radio-button.png')
-            }
+          <TouchableOpacity
+            style={styles.modeView}
+            onPress={() => {
+              setSelectedMethod(0);
+            }}>
+            <Image
+              style={[
+                styles.img,
+                {tintColor: selectedMethod == 0 ? '#121481' : '#000'},
+              ]}
+              source={
+                selectedMethod == 0
+                  ? require('../assets/radio-fill.png')
+                  : require('../assets/radio-button.png')
+              }
+            />
+            <Text style={styles.ModeTxt}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modeView}
+            onPress={() => {
+              setSelectedMethod(1);
+            }}>
+            <Image
+              style={[
+                styles.img,
+                {tintColor: selectedMethod == 1 ? '#121481' : '#000'},
+              ]}
+              source={
+                selectedMethod == 1
+                  ? require('../assets/radio-fill.png')
+                  : require('../assets/radio-button.png')
+              }
+            />
+            <Text style={styles.ModeTxt}>Work</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{marginBottom:40}}>
+          <CommonButton
+            bgColor={'#121481'}
+            title={'Save Address'}
+            textColor={'#fff'}
+            onPress={() => {
+              handleSaveAddress();
+            }}
           />
-          <Text style={styles.ModeTxt}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.modeView}
-          onPress={() => {
-            setSelectedMethod(1);
-          }}>
-          <Image
-            style={[
-              styles.img,
-              {tintColor: selectedMethod == 1 ? '#121481' : '#000'},
-            ]}
-            source={
-              selectedMethod == 1
-                ? require('../assets/radio-fill.png')
-                : require('../assets/radio-button.png')
-            }
-          />
-          <Text style={styles.ModeTxt}>Work</Text>
-        </TouchableOpacity>
-      </View>
-      <CommonButton
-        bgColor={'#121481'}
-        title={'Save Address'}
-        textColor={'#fff'}
-        onPress={() => {
-          handleSaveAddress();
-          // if (route?.params?.type == 'edit') {
-          //   dispatch(
-          //     updateAddress({
-          //       location: location,
-          //       state: state,
-          //       city: city,
-          //       pincode: pinCode,
-          //       type: selectedMethod == 0 ? 'Home' : 'Work',
-          //       id: route?.params?.data?.id,
-          //     }),
-          //     navigation.goBack(),
-          //   );
-          // } else {
-          //   dispatch(
-          //     setAddressData({
-          //       location: location,
-          //       state: state,
-          //       city: city,
-          //       pincode: pinCode,
-          //       type: selectedMethod == 0 ? 'Home' : 'Work',
-          //       id: uuid.v4(),
-          //     }),
-          //     navigation.goBack(),
-          //   );
-          // }
-        }}
-      />
-      <Loader modalVisible={isLoading}/>
+        </View>
+      </ScrollView>
+
+      <Loader modalVisible={isLoading} />
     </View>
   );
 };

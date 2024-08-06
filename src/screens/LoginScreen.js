@@ -82,7 +82,7 @@ const LoginScreen = () => {
         if (snapshot.docs[0] != []) {
           if (snapshot.docs[0]?._data?.password === password) {
             goToNextScreen(snapshot.docs[0]?._data);
-          }else{
+          } else {
             toast('Wrong Credentials');
           }
         }
@@ -199,8 +199,10 @@ const LoginScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             gap: 5,
-            paddingHorizontal: 30,
+            // paddingHorizontal: 30,
             marginTop: 25,
+            width: '85%',
+            left: 30,
           }}>
           <CheckBox
             style={{}}
@@ -213,7 +215,9 @@ const LoginScreen = () => {
             style={{
               color: '#000',
               fontSize: 16,
-            }}>
+              // flex:1
+            }}
+            allowFontScaling={false}>
             {"By Login, you agree to ShopCart's"}
           </Text>
           <TouchableOpacity>
@@ -222,7 +226,8 @@ const LoginScreen = () => {
                 color: '#121481',
                 fontSize: 16,
                 fontWeight: '500',
-              }}>
+              }}
+              allowFontScaling={false}>
               {'Privacy Policy'}
             </Text>
           </TouchableOpacity>

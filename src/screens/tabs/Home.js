@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  BackHandler,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../../common/Header';
@@ -23,6 +25,32 @@ const Home = () => {
   const dispatch = useDispatch();
   // const productState = useSelector(state => state?.products);
 
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true; // Prevent default behavior (exit app)
+      } else {
+        Alert.alert('Hold on!', 'Are you sure you want to exit the app?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {text: 'YES', onPress: () => BackHandler.exitApp()},
+        ]);
+        return true; // Prevent default behavior (exit app)
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove(); // Clean up the event listener
+  }, [navigation]);
+  
   useEffect(() => {
     getProducts();
   }, []);
@@ -54,7 +82,7 @@ const Home = () => {
         onClickLeftIcon={() => {
           navigation.openDrawer();
         }}
-        onClickRightIcon={()=>{
+        onClickRightIcon={() => {
           navigation.navigate('Cart');
         }}
       />
@@ -87,7 +115,7 @@ const Home = () => {
                         item?.title
                       }
                     </Text>
-                    <Text style={{color:"#888"}} numberOfLines={2}>
+                    <Text style={{color: '#888'}} numberOfLines={2}>
                       {
                         //    item.description.length > 35
                         //     ? item.description.substring(0, 35) + '...'
@@ -145,6 +173,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor:"#fff"
+    backgroundColor: '#fff',
   },
 });

@@ -34,6 +34,7 @@ const Checkout = () => {
   const [selectedAddress, setSelectedAddress] = useState('');
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
+  const [name, setName] = useState('');
 
   useEffect(() => {
     setCartItems(cartState?.cartData);
@@ -49,10 +50,15 @@ const Checkout = () => {
 
   useEffect(() => {
     getSelectedAddress();
+    getProfile();
   }, [isFocused]);
 
   const getSelectedAddress = async () => {
     setSelectedAddress(await AsyncStorage.getItem('My_Address'));
+  };
+
+  const getProfile = async () => {
+    setName(await AsyncStorage.getItem('NAME'));
   };
 
   const orderPlace = paymentId => {
@@ -108,7 +114,7 @@ const Checkout = () => {
         currency: 'INR',
         key: 'rzp_test_WAYMtWq1G07zQr', // Your api key
         amount: getTotal() * 1000,
-        name: 'Test User',
+        name: {name},
         prefill: {
           email: 'void@razorpay.com',
           contact: '9191919191',
@@ -125,8 +131,10 @@ const Checkout = () => {
         .catch(error => {
           // handle failure
           // alert(`Error: ${error.code} | ${error.description}`);
+
           Alert.alert(
-            "Order Couldn't be placed !!! Try with TEST CARD NUMBER = 4111 1111 1111 1111",
+            "Order Couldn't be placed !!!",
+            'Try with : TEST CARD NUMBER = 4111 1111 1111 1111',
           );
         });
     } else {
@@ -361,7 +369,7 @@ const Checkout = () => {
             onPress={() => {
               navigation.navigate('Addresses');
             }}>
-            Edit Address
+            Add Address
           </Text>
         </View>
 
@@ -373,7 +381,7 @@ const Checkout = () => {
           numberOfLines={4}>
           {selectedAddress != '' && selectedAddress != null
             ? selectedAddress
-            : 'Please Select Address'}
+            : 'Please Add Address'}
         </Text>
         <View style={{}}>
           <CommonButton
