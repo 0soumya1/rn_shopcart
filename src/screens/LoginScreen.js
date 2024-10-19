@@ -202,7 +202,7 @@ const LoginScreen = () => {
             // paddingHorizontal: 30,
             marginTop: 25,
             width: '85%',
-            left: 30,
+            left: 15,
           }}>
           <CheckBox
             style={{}}
@@ -215,18 +215,21 @@ const LoginScreen = () => {
             style={{
               color: '#000',
               fontSize: 16,
-              // flex:1
             }}
             allowFontScaling={false}>
             {"By Login, you agree to ShopCart's"}
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('PACPage');
+            }}>
             <Text
               style={{
                 color: '#121481',
                 fontSize: 16,
                 fontWeight: '500',
               }}
+              numberOfLines={2}
               allowFontScaling={false}>
               {'Privacy Policy'}
             </Text>
@@ -320,5 +323,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 10,
   },
 });
