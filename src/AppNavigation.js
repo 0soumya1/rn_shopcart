@@ -15,6 +15,7 @@ import OrderSuccess from './screens/OrderSuccess';
 import Orders from './screens/Orders';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import PACPage from './screens/PACPage';
+import EditProfile from './screens/EditProfile';
 
 const Stack = createNativeStackNavigator();
 const AppNavigation = () => {
@@ -36,6 +37,7 @@ const AppNavigation = () => {
           <Stack.Screen name="OrderSuccess" component={OrderSuccess} />
           <Stack.Screen name="Orders" component={Orders} />
           <Stack.Screen name="PACPage" component={PACPage} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

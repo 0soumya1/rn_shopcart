@@ -40,12 +40,10 @@ const Profile = () => {
         return true; // Prevent default behavior (exit app)
       }
     };
-
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
     );
-
     return () => backHandler.remove(); // Clean up the event listener
   }, [navigation]);
 
@@ -81,7 +79,11 @@ const Profile = () => {
           {email}
         </Text>
 
-        {/* <TouchableOpacity style={[styles.tab, {marginTop: 40}]}>
+        {/* <TouchableOpacity style={[styles.tab, {marginTop: 40}]}
+         onPress={() => {
+          navigation.navigate('EditProfile');
+        }}
+        >
           <Text style={styles.txt}>Edit Profile</Text>
           <Image
             style={styles.next}
